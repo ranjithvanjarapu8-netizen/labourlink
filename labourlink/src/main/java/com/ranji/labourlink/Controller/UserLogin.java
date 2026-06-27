@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ranji.labourlink.Model.User;
 import com.ranji.labourlink.Service.UserLoginServ;
 import com.ranji.labourlink.dto.LoginDto;
+import com.ranji.labourlink.dto.LoginResponse;
 import com.ranji.labourlink.dto.registerDto;
 
 
@@ -28,7 +29,7 @@ public class UserLogin {
 	public UserLoginServ logserv;
 	
 	@PostMapping("/login")
-	public ResponseEntity<String> Login(@RequestBody LoginDto log){
+	public ResponseEntity<LoginResponse> Login(@RequestBody LoginDto log){
 		return logserv.login(log);
 	}
 	
