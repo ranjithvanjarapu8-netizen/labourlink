@@ -1,5 +1,7 @@
 package com.ranji.labourlink.Repository;
 
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -10,6 +12,8 @@ public interface UserLoginRepo extends JpaRepository<User,Integer>{
 	
 	@Query("SELECT u FROM User AS u WHERE u.phoneNumber = :phno")
 	User findByphno(@Param("phno") String phno);
+
+	Optional<User> findByPhoneNumber(String phone);
 
 
 }
