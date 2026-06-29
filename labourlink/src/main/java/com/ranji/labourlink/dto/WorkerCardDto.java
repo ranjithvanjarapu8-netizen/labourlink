@@ -1,12 +1,14 @@
 package com.ranji.labourlink.dto;
 
+import java.util.List;
+
 public class WorkerCardDto {
 
     private Long workerId;
 
     private String name;
 
-    private String profession;
+    private List<String> profession;
 
     private Integer experience;
 
@@ -22,8 +24,9 @@ public class WorkerCardDto {
     	
     }
 
-	public WorkerCardDto(Long workerId, String name, String profession, Integer experience, Double rating,
-			Integer totalJobs, String profilePhoto) {
+
+	public WorkerCardDto(Long workerId, String name, List<String> profession, Integer experience, Double rating,
+			Integer totalJobs, String profilePhoto, Double distance) {
 		super();
 		this.workerId = workerId;
 		this.name = name;
@@ -32,6 +35,7 @@ public class WorkerCardDto {
 		this.rating = rating;
 		this.totalJobs = totalJobs;
 		this.profilePhoto = profilePhoto;
+		this.distance = distance;
 	}
 
 	public Long getWorkerId() {
@@ -50,13 +54,16 @@ public class WorkerCardDto {
 		this.name = name;
 	}
 
-	public String getProfession() {
+
+	public List<String> getProfession() {
 		return profession;
 	}
 
-	public void setProfession(String profession) {
+
+	public void setProfession(List<String> profession) {
 		this.profession = profession;
 	}
+
 
 	public Integer getExperience() {
 		return experience;

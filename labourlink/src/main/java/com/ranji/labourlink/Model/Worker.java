@@ -1,6 +1,8 @@
 package com.ranji.labourlink.Model;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "workers")
@@ -14,28 +16,49 @@ public class Worker {
     @JoinColumn(name = "user_id", unique = true)
     private User user;
 
-    @Column(nullable = false)
-    private String profession;
-
+    @ManyToMany
+    @JoinTable(
+        name = "worker_profession",
+        joinColumns = @JoinColumn(name = "worker_id"),
+        inverseJoinColumns = @JoinColumn(name = "profession_id")
+    )
+    private List<Profession> professions = new ArrayList<>();
     private Integer experience;
 
     private Double latitude;
 
     private Double longitude;
+    private String city;
+
+    private String district;
+
+    private String state;
 
     private Boolean available = true;
 
     private Double rating = 0.0;
 
     private Integer totalJobs = 0;
-
+    private String languages;
+    
     private String aadhaarNumber;
 
     private String profilePhoto;
+    
+    private String description;
 
     private LocalDateTime createdAt = LocalDateTime.now();
     public Worker() {
     }
+    
+	public String getLanguages() {
+		return languages;
+	}
+
+	public void setLanguages(String languages) {
+		this.languages = languages;
+	}
+
 	public Long getId() {
 		return id;
 	}
@@ -44,6 +67,30 @@ public class Worker {
 		this.id = id;
 	}
 
+	public List<Profession> getProfessions() {
+		return professions;
+	}
+	public void setProfessions(List<Profession> professions) {
+		this.professions = professions;
+	}
+	public String getCity() {
+		return city;
+	}
+	public void setCity(String city) {
+		this.city = city;
+	}
+	public String getDistrict() {
+		return district;
+	}
+	public void setDistrict(String district) {
+		this.district = district;
+	}
+	public String getState() {
+		return state;
+	}
+	public void setState(String state) {
+		this.state = state;
+	}
 	public User getUser() {
 		return user;
 	}
@@ -52,13 +99,6 @@ public class Worker {
 		this.user = user;
 	}
 
-	public String getProfession() {
-		return profession;
-	}
-
-	public void setProfession(String profession) {
-		this.profession = profession;
-	}
 
 	public Integer getExperience() {
 		return experience;
@@ -132,16 +172,19 @@ public class Worker {
 		this.createdAt = createdAt;
 	}
 
-	public Worker(Long id, User user, String profession, Integer experience, Double latitude, Double longitude,
-			Boolean available, Double rating, Integer totalJobs, String aadhaarNumber, String profilePhoto,
-			LocalDateTime createdAt) {
+	public Worker(Long id, User user, List<Profession> professions, Integer experience,
+			Double latitude, Double longitude, String city, String district, String state, Boolean available,
+			Double rating, Integer totalJobs, String aadhaarNumber, String profilePhoto, LocalDateTime createdAt) {
 		super();
 		this.id = id;
 		this.user = user;
-		this.profession = profession;
+		this.professions = professions;
 		this.experience = experience;
 		this.latitude = latitude;
 		this.longitude = longitude;
+		this.city = city;
+		this.district = district;
+		this.state = state;
 		this.available = available;
 		this.rating = rating;
 		this.totalJobs = totalJobs;
@@ -149,12 +192,24 @@ public class Worker {
 		this.profilePhoto = profilePhoto;
 		this.createdAt = createdAt;
 	}
+	public String getDescription() {
+		return description;
+	}
+	public void setDescription(String description) {
+		this.description = description;
+	}
+	public Worker(String description) {
+		super();
+		this.description = description;
+	}
+
 	@Override
 	public String toString() {
-		return "Worker [id=" + id + ", user=" + user + ", profession=" + profession + ", experience=" + experience
-				+ ", latitude=" + latitude + ", longitude=" + longitude + ", available=" + available + ", rating="
-				+ rating + ", totalJobs=" + totalJobs + ", aadhaarNumber=" + aadhaarNumber + ", profilePhoto="
-				+ profilePhoto + ", createdAt=" + createdAt + "]";
+		return "Worker [id=" + id + ", user=" + user + ", professions=" + professions + ", experience=" + experience
+				+ ", latitude=" + latitude + ", longitude=" + longitude + ", city=" + city + ", district=" + district
+				+ ", state=" + state + ", available=" + available + ", rating=" + rating + ", totalJobs=" + totalJobs
+				+ ", languages=" + languages + ", aadhaarNumber=" + aadhaarNumber + ", profilePhoto=" + profilePhoto
+				+ ", description=" + description + ", createdAt=" + createdAt + "]";
 	}
 
     // Getters and Setters

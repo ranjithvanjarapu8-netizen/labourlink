@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,13 +16,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.ranji.labourlink.Model.Profession;
 import com.ranji.labourlink.Model.User;
 import com.ranji.labourlink.Model.Worker;
+import com.ranji.labourlink.Repository.ProfessionRepo;
 import com.ranji.labourlink.Repository.UserLoginRepo;
 import com.ranji.labourlink.Repository.WorkerRepo;
 import com.ranji.labourlink.dto.WorkerCardDto;
 import com.ranji.labourlink.dto.WorkerRegisterDto;
-import com.ranji.labourlink.dto.wrkrProfileDto;
+import com.ranji.labourlink.dto.WrkrProfileDto;
+import com.ranji.labourlink.dto.WrkrProfileDto;
 
 @Service
 public class WorkerServ {
@@ -30,6 +34,9 @@ public class WorkerServ {
 	
 	@Autowired
 	private UserLoginRepo userrep;
+	
+	@Autowired
+	private ProfessionRepo profrep;
 	
 	public boolean hasWorkerProfile(User user) {
 	    return wrkrrep.existsByUser(user);
@@ -72,28 +79,51 @@ public class WorkerServ {
 	    Worker worker = new Worker();
 
 	    worker.setUser(user);
-	    worker.setProfession(dto.getProfession());
+
 	    worker.setExperience(dto.getExperience());
+
+	    worker.setCity(dto.getCity());
+	    worker.setDistrict(dto.getDistrict());
+	    worker.setState(dto.getState());
+
+	    List<Profession> professions =profrep.findAllById(dto.getProfessionIds());
+
+	    worker.setProfessions(professions);
+
 	    worker.setLatitude(dto.getLatitude());
 	    worker.setLongitude(dto.getLongitude());
-	    worker.setAadhaarNumber(dto.getAadhaarNumber());
-	    worker.setAvailable(true);
-	    worker.setProfilePhoto(fileName);
-	    wrkrrep.save(worker);
 
+	    worker.setAadhaarNumber(dto.getAadhaarNumber());
+	    worker.setLanguages(dto.getLanguages());
+	    worker.setDescription(dto.getDescription());
+
+	    worker.setAvailable(true);
+
+	    worker.setProfilePhoto(fileName);
+
+	    wrkrrep.save(worker);
 	    return "Worker profile created successfully.";
 	}
-	public wrkrProfileDto getWorkerProfile(User user) {
+	public WrkrProfileDto getWorkerProfile(User user) {
 		
 	    Worker worker = wrkrrep.findByUser(user)
 	            .orElseThrow(() -> new RuntimeException("Worker profile not found"));
 
-	    wrkrProfileDto dto = new  wrkrProfileDto();
+	    WrkrProfileDto dto = new  WrkrProfileDto();
 
 	    dto.setName(user.getName());
 	    dto.setPhoneNumber(user.getPhoneNumber());
+	    dto.setCity(worker.getCity());
+	    dto.setDistrict(worker.getDistrict());
+	    dto.setState(worker.getState());
+	    dto.setDescription(worker.getDescription());
+	    dto.setLanguages(worker.getLanguages());
+	    List<String> professionNames = worker.getProfessions()
+                .stream()
+                .map(Profession::getName)
+                .toList();
 
-	    dto.setProfession(worker.getProfession());
+        dto.setProfessions(professionNames);
 	    dto.setExperience(worker.getExperience());
 	    dto.setRating(worker.getRating());
 	    dto.setTotalJobs(worker.getTotalJobs());
@@ -106,11 +136,35 @@ public class WorkerServ {
 	}
 
 	public ResponseEntity<List<WorkerCardDto>> allwrkrs() {
-		List<WorkerCardDto> ans = wrkrrep.findAllDto();
-		return ResponseEntity.ok(ans);
-	}
 
-	public List<WorkerCardDto> getNearbyWorkers(double lat,double lon){
+	    List<Worker> workers = wrkrrep.findAllWithUser();
+
+	    List<WorkerCardDto> ans = new ArrayList<>();
+
+	    for (Worker worker : workers) {
+
+	        WorkerCardDto dto = new WorkerCardDto();
+
+	        dto.setWorkerId(worker.getId());
+	        dto.setName(worker.getUser().getName());
+	        dto.setExperience(worker.getExperience());
+	        dto.setRating(worker.getRating());
+	        dto.setTotalJobs(worker.getTotalJobs());
+	        dto.setProfilePhoto(worker.getProfilePhoto());
+
+	        List<String> professionNames = worker.getProfessions()
+	                .stream()
+	                .map(Profession::getName)
+	                .toList();
+	        
+	        dto.setProfession(professionNames);
+
+	        ans.add(dto);
+	    }
+
+	    return ResponseEntity.ok(ans);
+	}
+	public List<WorkerCardDto> getNearbyWorkers(double lat,double lon, String profession){
 
 	    List<Worker> workers = wrkrrep.findAllWithUser();
 
@@ -128,12 +182,24 @@ public class WorkerServ {
 	                worker.getLongitude());
 
 	        if(distance <= 20){
+	        	if (profession != null &&
+		                !profession.isBlank() &&
+		                !worker.getProfessions().contains(profession)) {
+
+		                continue;
+		            }
 
 	            WorkerCardDto dto = new WorkerCardDto();
 	            dto.setWorkerId(worker.getId());
 	            dto.setName(worker.getUser().getName());
-	            dto.setProfession(worker.getProfession());
 	            dto.setExperience(worker.getExperience());
+
+	            List<String> professionNames = worker.getProfessions()
+	                    .stream()
+	                    .map(Profession::getName)
+	                    .toList();
+
+	            dto.setProfession(professionNames);
 	            dto.setRating(worker.getRating());
 	            dto.setTotalJobs(worker.getTotalJobs());
 	            dto.setProfilePhoto(worker.getProfilePhoto());
@@ -174,4 +240,5 @@ public class WorkerServ {
 
 	    return R * c;
 	}
+
 }

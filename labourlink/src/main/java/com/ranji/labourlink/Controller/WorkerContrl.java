@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -73,7 +74,10 @@ public class WorkerContrl {
 		User user = userrep.findByPhoneNumber(phone)
 	            .orElseThrow(() -> new RuntimeException("User not found"));
 		Optional<Worker> wrkr = wrkrrep.findByUser(user);
-		if(wrkr.isEmpty()) return ResponseEntity.ok("Worker Not Found");
+		if (wrkr.isEmpty()) {
+		    return ResponseEntity.status(HttpStatus.NOT_FOUND)
+		            .body("Worker Not Found");
+		}
 		return ResponseEntity.ok(wrkrserv.getWorkerProfile(user));
 	}
 	
@@ -84,8 +88,9 @@ public class WorkerContrl {
 	@GetMapping("/nearby")
 	public ResponseEntity<List<WorkerCardDto>> getNearbyWorkers(
 	        @RequestParam Double lat,
-	        @RequestParam Double lon){
+	        @RequestParam Double lon,@RequestParam(required = false) String profession){
 
-	    return ResponseEntity.ok(wrkrserv.getNearbyWorkers(lat, lon));
+	    return ResponseEntity.ok(wrkrserv.getNearbyWorkers(lat, lon,profession));
 	}
+	
 }
