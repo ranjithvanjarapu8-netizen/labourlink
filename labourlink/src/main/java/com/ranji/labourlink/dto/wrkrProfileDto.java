@@ -1,5 +1,6 @@
 package com.ranji.labourlink.dto;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public class WrkrProfileDto {
@@ -33,12 +34,21 @@ public class WrkrProfileDto {
     private String description;
 
     private String languages;
+    private LocalDate createdAt;
 
     public WrkrProfileDto() {
 
     }
 
-    public String getName() {
+    public LocalDate getCreatedAt() {
+		return createdAt;
+	}
+
+	public void setCreatedAt(LocalDate createdAt) {
+		this.createdAt = createdAt;
+	}
+
+	public String getName() {
         return name;
     }
 

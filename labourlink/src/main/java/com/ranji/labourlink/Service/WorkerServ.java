@@ -22,6 +22,7 @@ import com.ranji.labourlink.Model.Worker;
 import com.ranji.labourlink.Repository.ProfessionRepo;
 import com.ranji.labourlink.Repository.UserLoginRepo;
 import com.ranji.labourlink.Repository.WorkerRepo;
+import com.ranji.labourlink.dto.OwnrWrkrProfileDto;
 import com.ranji.labourlink.dto.WorkerCardDto;
 import com.ranji.labourlink.dto.WorkerRegisterDto;
 import com.ranji.labourlink.dto.WrkrProfileDto;
@@ -131,6 +132,7 @@ public class WorkerServ {
 	    dto.setLatitude(worker.getLatitude());
 	    dto.setLongitude(worker.getLongitude());
 	    dto.setProfilePhoto(worker.getProfilePhoto());
+	    dto.setCreatedAt(worker.getCreatedAt().toLocalDate());
 
 	    return dto;
 	}
@@ -142,7 +144,7 @@ public class WorkerServ {
 	    List<WorkerCardDto> ans = new ArrayList<>();
 
 	    for (Worker worker : workers) {
-
+	    	if(!worker.getAvailable()) continue;
 	        WorkerCardDto dto = new WorkerCardDto();
 
 	        dto.setWorkerId(worker.getId());
@@ -182,12 +184,12 @@ public class WorkerServ {
 	                worker.getLongitude());
 
 	        if(distance <= 20){
-	        	if (profession != null &&
-		                !profession.isBlank() &&
-		                !worker.getProfessions().contains(profession)) {
-
-		                continue;
-		            }
+	        	if (profession != null
+	        	        && !profession.isBlank()
+	        	        && worker.getProfessions().stream()
+	        	            .noneMatch(p -> p.getName().equalsIgnoreCase(profession))) {
+	        	    continue;
+	        	}
 
 	            WorkerCardDto dto = new WorkerCardDto();
 	            dto.setWorkerId(worker.getId());
@@ -239,6 +241,32 @@ public class WorkerServ {
 	    double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
 	    return R * c;
+	}
+
+	public ResponseEntity<OwnrWrkrProfileDto> getIdWrkr(Long id) {
+		Optional<Worker> worker = wrkrrep.findByIdWithUser(id);
+		if(worker.isEmpty()) return ResponseEntity.notFound().build();
+		Worker n = worker.get();
+		OwnrWrkrProfileDto wrkr = new OwnrWrkrProfileDto();
+		wrkr.setAvailable(n.getAvailable());
+		wrkr.setCity(n.getCity());
+		wrkr.setCreatedAt(n.getCreatedAt().toLocalDate());
+		wrkr.setDescription(n.getDescription());
+		wrkr.setDistrict(n.getDistrict());
+		wrkr.setExperience(n.getExperience());
+		wrkr.setLanguages(n.getLanguages());
+		wrkr.setName(n.getUser().getName());
+		List<String> professionNames = n.getProfessions()
+                .stream()
+                .map(Profession::getName)
+                .toList();
+
+        wrkr.setProfessions(professionNames);
+        wrkr.setProfilePhoto(n.getProfilePhoto());
+        wrkr.setRating(n.getRating());
+        wrkr.setState(n.getState());
+        wrkr.setTotalJobs(n.getTotalJobs());
+        return ResponseEntity.ok(wrkr);
 	}
 
 }

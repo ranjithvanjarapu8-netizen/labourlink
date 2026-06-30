@@ -32,4 +32,13 @@ public interface WorkerRepo extends JpaRepository<Worker,Long>{
 		    """)
 		List<Worker> findAllWithUser();
 
+	@Query("""
+		    SELECT DISTINCT w
+		    FROM Worker w
+		    LEFT JOIN FETCH w.user
+		    LEFT JOIN FETCH w.professions
+		    WHERE w.id = :id
+		""")
+		Optional<Worker> findByIdWithUser(Long id);
+
 }	

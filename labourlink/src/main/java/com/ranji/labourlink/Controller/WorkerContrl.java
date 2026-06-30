@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,8 +23,10 @@ import com.ranji.labourlink.Model.Worker;
 import com.ranji.labourlink.Repository.UserLoginRepo;
 import com.ranji.labourlink.Repository.WorkerRepo;
 import com.ranji.labourlink.Service.WorkerServ;
+import com.ranji.labourlink.dto.OwnrWrkrProfileDto;
 import com.ranji.labourlink.dto.WorkerCardDto;
 import com.ranji.labourlink.dto.WorkerRegisterDto;
+import com.ranji.labourlink.dto.WrkrProfileDto;
 
 @CrossOrigin(origins = {"http://127.0.0.1:5501",
         "http://127.0.0.1:5500",
@@ -91,6 +94,10 @@ public class WorkerContrl {
 	        @RequestParam Double lon,@RequestParam(required = false) String profession){
 
 	    return ResponseEntity.ok(wrkrserv.getNearbyWorkers(lat, lon,profession));
+	}
+	@GetMapping("/profile/{id}")
+	public ResponseEntity<OwnrWrkrProfileDto> getIdWrkr(@PathVariable Long id){
+		return wrkrserv.getIdWrkr(id);
 	}
 	
 }

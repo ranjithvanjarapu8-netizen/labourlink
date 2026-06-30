@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.ranji.labourlink.Model.Profession;
@@ -58,5 +59,11 @@ public class WrkWageServ {
 
         return result;
     }
+
+	public ResponseEntity<?> profwage(String profession) {
+		Profession prof = professionRepo.findByProfession(profession);
+		List<WrkWage> works = wageRepo.findByProfession(prof);
+		return ResponseEntity.ok(works);
+	}
 
 }
