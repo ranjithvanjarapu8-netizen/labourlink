@@ -1,5 +1,6 @@
 package com.ranji.labourlink.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -11,6 +12,7 @@ import com.ranji.labourlink.Model.RequestStatusEnum;
 import com.ranji.labourlink.Model.User;
 import com.ranji.labourlink.Model.WorkRequest;
 import com.ranji.labourlink.Model.Worker;
+import com.ranji.labourlink.dto.OwnerRequestDto;
 
 public interface WrkRequestRepo extends JpaRepository<WorkRequest,Long>{
 
@@ -74,4 +76,29 @@ public interface WrkRequestRepo extends JpaRepository<WorkRequest,Long>{
 		        @Param("status") RequestStatusEnum status);
 
 	boolean existsByWorkerAndStatus(Worker worker, RequestStatusEnum accepted);
+
+	@Query("""
+		SELECT new com.ranji.labourlink.dto.OwnerRequestDto(
+		    wr.id,
+		    w.id,
+		    u.name,
+		    u.phoneNumber,
+		    w.profilePhoto,
+		    p.name,
+		    wr.title,
+		    wr.address,
+		    wr.workDate,
+		    wr.startTime,
+		    wr.endTime,
+		    wr.status
+		)
+		FROM WorkRequest wr
+		JOIN wr.worker w
+		JOIN w.user u
+		JOIN wr.profession p
+		WHERE wr.owner.id = :ownerId
+		""")
+		List<OwnerRequestDto> findOwnerRequests(@Param("ownerId") Long ownerId);
+
+	boolean existsByWorkerAndWorkDateAndStatus(Worker worker, LocalDate workDate, RequestStatusEnum accepted);
 }

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -17,11 +18,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.ranji.labourlink.Model.Profession;
+import com.ranji.labourlink.Model.RequestStatusEnum;
 import com.ranji.labourlink.Model.User;
 import com.ranji.labourlink.Model.Worker;
 import com.ranji.labourlink.Repository.ProfessionRepo;
 import com.ranji.labourlink.Repository.UserLoginRepo;
 import com.ranji.labourlink.Repository.WorkerRepo;
+import com.ranji.labourlink.Repository.WrkRequestRepo;
 import com.ranji.labourlink.dto.OwnrWrkrProfileDto;
 import com.ranji.labourlink.dto.WorkerCardDto;
 import com.ranji.labourlink.dto.WorkerRegisterDto;
@@ -38,6 +41,9 @@ public class WorkerServ {
 	
 	@Autowired
 	private ProfessionRepo profrep;
+	
+	@Autowired
+	private WrkRequestRepo requestRepo;
 	
 	public boolean hasWorkerProfile(User user) {
 	    return wrkrrep.existsByUser(user);
@@ -166,7 +172,7 @@ public class WorkerServ {
 
 	    return ResponseEntity.ok(ans);
 	}
-	public List<WorkerCardDto> getNearbyWorkers(double lat,double lon, String profession){
+	public List<WorkerCardDto> getNearbyWorkers(double lat,double lon, String profession, LocalDate workDate){
 
 	    List<Worker> workers = wrkrrep.findAllWithUser();
 
@@ -174,8 +180,13 @@ public class WorkerServ {
 
 	    for(Worker worker : workers){
 
-	        if(!worker.getAvailable())
-	            continue;
+	    	if (requestRepo.existsByWorkerAndWorkDateAndStatus(
+	    	        worker,
+	    	        workDate,
+	    	        RequestStatusEnum.ACCEPTED)) {
+
+	    	    continue;
+	    	}
 
 	        double distance = calculateDistance(
 	                lat,

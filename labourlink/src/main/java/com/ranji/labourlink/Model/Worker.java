@@ -37,7 +37,7 @@ public class Worker {
     private Boolean available = true;
 
     private Double rating = 0.0;
-
+    private Integer totalRatings = 0;
     private Integer totalJobs = 0;
     private String languages;
     
@@ -172,9 +172,10 @@ public class Worker {
 		this.createdAt = createdAt;
 	}
 
-	public Worker(Long id, User user, List<Profession> professions, Integer experience,
-			Double latitude, Double longitude, String city, String district, String state, Boolean available,
-			Double rating, Integer totalJobs, String aadhaarNumber, String profilePhoto, LocalDateTime createdAt) {
+	public Worker(Long id, User user, List<Profession> professions, Integer experience, Double latitude,
+			Double longitude, String city, String district, String state, Boolean available, Double rating,
+			Integer totalRatings, Integer totalJobs, String languages, String aadhaarNumber, String profilePhoto,
+			String description, LocalDateTime createdAt) {
 		super();
 		this.id = id;
 		this.user = user;
@@ -187,11 +188,24 @@ public class Worker {
 		this.state = state;
 		this.available = available;
 		this.rating = rating;
+		this.totalRatings = totalRatings;
 		this.totalJobs = totalJobs;
+		this.languages = languages;
 		this.aadhaarNumber = aadhaarNumber;
 		this.profilePhoto = profilePhoto;
+		this.description = description;
 		this.createdAt = createdAt;
 	}
+
+	
+	public Integer getTotalRatings() {
+		return totalRatings;
+	}
+
+	public void setTotalRatings(Integer totalRatings) {
+		this.totalRatings = totalRatings;
+	}
+
 	public String getDescription() {
 		return description;
 	}
@@ -207,9 +221,10 @@ public class Worker {
 	public String toString() {
 		return "Worker [id=" + id + ", user=" + user + ", professions=" + professions + ", experience=" + experience
 				+ ", latitude=" + latitude + ", longitude=" + longitude + ", city=" + city + ", district=" + district
-				+ ", state=" + state + ", available=" + available + ", rating=" + rating + ", totalJobs=" + totalJobs
-				+ ", languages=" + languages + ", aadhaarNumber=" + aadhaarNumber + ", profilePhoto=" + profilePhoto
-				+ ", description=" + description + ", createdAt=" + createdAt + "]";
+				+ ", state=" + state + ", available=" + available + ", rating=" + rating + ", totalRatings="
+				+ totalRatings + ", totalJobs=" + totalJobs + ", languages=" + languages + ", aadhaarNumber="
+				+ aadhaarNumber + ", profilePhoto=" + profilePhoto + ", description=" + description + ", createdAt="
+				+ createdAt + "]";
 	}
 
     // Getters and Setters

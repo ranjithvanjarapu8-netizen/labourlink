@@ -65,6 +65,8 @@ public class WorkRequest {
 
     @Column(nullable = false)
     private LocalDateTime updatedAt;
+    
+    private boolean workerRated = false;
 
     @PrePersist
     public void onCreate() {
@@ -75,6 +77,7 @@ public class WorkRequest {
     public void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
+    
     public WorkRequest() {
     	
     }
@@ -167,6 +170,12 @@ public class WorkRequest {
 	}
 	public void setUpdatedAt(LocalDateTime updatedAt) {
 		this.updatedAt = updatedAt;
+	}
+	public boolean isWorkerRated() {
+		return workerRated;
+	}
+	public void setWorkerRated(boolean workerRated) {
+		this.workerRated = workerRated;
 	}
     
     

@@ -1,6 +1,7 @@
 package com.ranji.labourlink.Controller;
 import org.springframework.security.core.Authentication;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -91,9 +92,9 @@ public class WorkerContrl {
 	@GetMapping("/nearby")
 	public ResponseEntity<List<WorkerCardDto>> getNearbyWorkers(
 	        @RequestParam Double lat,
-	        @RequestParam Double lon,@RequestParam(required = false) String profession){
+	        @RequestParam Double lon,@RequestParam(required = false) String profession,@RequestParam LocalDate date){
 
-	    return ResponseEntity.ok(wrkrserv.getNearbyWorkers(lat, lon,profession));
+	    return ResponseEntity.ok(wrkrserv.getNearbyWorkers(lat, lon,profession,date));
 	}
 	@GetMapping("/profile/{id}")
 	public ResponseEntity<OwnrWrkrProfileDto> getIdWrkr(@PathVariable Long id){
