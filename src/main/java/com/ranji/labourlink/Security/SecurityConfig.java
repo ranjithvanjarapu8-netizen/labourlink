@@ -38,6 +38,7 @@ public class SecurityConfig {
                                 "/api/auth/**",
                                 "/otp/**",
                                 "/api/profession/**",
+                                "/api/wages/**",
                                 "/uploads/**",
                                 "/forgot-password/**"
                         ).permitAll()

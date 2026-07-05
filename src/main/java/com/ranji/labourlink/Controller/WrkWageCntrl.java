@@ -27,6 +27,7 @@ public class WrkWageCntrl {
 	}
 	@GetMapping("/{profession}")
 	public ResponseEntity<?> profwage(@PathVariable String profession){
+
 		return wageserv.profwage(profession);
 	}
 }
