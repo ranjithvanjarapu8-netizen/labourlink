@@ -16,13 +16,8 @@ public class Worker {
     @JoinColumn(name = "user_id", unique = true)
     private User user;
 
-    @ManyToMany
-    @JoinTable(
-        name = "worker_profession",
-        joinColumns = @JoinColumn(name = "worker_id"),
-        inverseJoinColumns = @JoinColumn(name = "profession_id")
-    )
-    private List<Profession> professions = new ArrayList<>();
+    @OneToMany(mappedBy = "worker", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<WorkerProfession> workerProfessions = new ArrayList<>();
     private Integer experience;
 
     private Double latitude;
@@ -67,11 +62,12 @@ public class Worker {
 		this.id = id;
 	}
 
-	public List<Profession> getProfessions() {
-		return professions;
+	public List<WorkerProfession> getWorkerProfessions() {
+	    return workerProfessions;
 	}
-	public void setProfessions(List<Profession> professions) {
-		this.professions = professions;
+
+	public void setWorkerProfessions(List<WorkerProfession> workerProfessions) {
+	    this.workerProfessions = workerProfessions;
 	}
 	public String getCity() {
 		return city;
@@ -172,14 +168,14 @@ public class Worker {
 		this.createdAt = createdAt;
 	}
 
-	public Worker(Long id, User user, List<Profession> professions, Integer experience, Double latitude,
+	public Worker(Long id, User user, List<WorkerProfession> workerProfessions, Integer experience, Double latitude,
 			Double longitude, String city, String district, String state, Boolean available, Double rating,
 			Integer totalRatings, Integer totalJobs, String languages, String aadhaarNumber, String profilePhoto,
 			String description, LocalDateTime createdAt) {
 		super();
 		this.id = id;
 		this.user = user;
-		this.professions = professions;
+		this.workerProfessions = workerProfessions;
 		this.experience = experience;
 		this.latitude = latitude;
 		this.longitude = longitude;
@@ -219,7 +215,7 @@ public class Worker {
 
 	@Override
 	public String toString() {
-		return "Worker [id=" + id + ", user=" + user + ", professions=" + professions + ", experience=" + experience
+		return "Worker [id=" + id + ", user=" + user + ", workerProfessions=" + workerProfessions + ", experience=" + experience
 				+ ", latitude=" + latitude + ", longitude=" + longitude + ", city=" + city + ", district=" + district
 				+ ", state=" + state + ", available=" + available + ", rating=" + rating + ", totalRatings="
 				+ totalRatings + ", totalJobs=" + totalJobs + ", languages=" + languages + ", aadhaarNumber="

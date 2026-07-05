@@ -1,6 +1,10 @@
 package com.ranji.labourlink.Model;
 
 import jakarta.persistence.Column;
+import java.util.ArrayList;
+import java.util.List;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -21,6 +25,9 @@ public class Profession {
    
 	@Column(name = "daily_wage")
     private Integer dailyWage;
+	
+	@OneToMany(mappedBy = "profession", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<WorkerProfession> workerProfessions = new ArrayList<>();
     
     public Profession() {
     	
@@ -51,7 +58,13 @@ public class Profession {
 	public void setName(String name) {
 		this.name = name;
 	}
+	public List<WorkerProfession> getWorkerProfessions() {
+	    return workerProfessions;
+	}
 
+	public void setWorkerProfessions(List<WorkerProfession> workerProfessions) {
+	    this.workerProfessions = workerProfessions;
+	}
 	public String getDescription() {
 		return description;
 	}
