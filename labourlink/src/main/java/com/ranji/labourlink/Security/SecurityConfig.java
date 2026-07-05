@@ -38,7 +38,8 @@ public class SecurityConfig {
                                 "/api/auth/**",
                                 "/otp/**",
                                 "/api/profession/**",
-                                "/uploads/**"
+                                "/uploads/**",
+                                "/forgot-password/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )

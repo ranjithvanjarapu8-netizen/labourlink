@@ -172,9 +172,11 @@ public class WorkerServ {
 
 	    return ResponseEntity.ok(ans);
 	}
-	public List<WorkerCardDto> getNearbyWorkers(double lat,double lon, String profession, LocalDate workDate){
+	public List<WorkerCardDto> getNearbyWorkers(double lat,double lon, String profession, String Date){
 
 	    List<Worker> workers = wrkrrep.findAllWithUser();
+	    LocalDate workDate = LocalDate.parse(Date);
+ // 2026-07-03
 
 	    List<WorkerCardDto> ans = new ArrayList<>();
 

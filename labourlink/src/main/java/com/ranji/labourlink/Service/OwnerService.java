@@ -4,14 +4,20 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.ranji.labourlink.Model.RequestStatusEnum;
 import com.ranji.labourlink.Model.User;
+import com.ranji.labourlink.Model.WorkRequest;
+import com.ranji.labourlink.Model.WorkerRating;
 import com.ranji.labourlink.Repository.UserLoginRepo;
+import com.ranji.labourlink.Repository.WorkerRatingRepo;
 import com.ranji.labourlink.Repository.WrkRequestRepo;
+import com.ranji.labourlink.dto.OwnerCompletedRequestDto;
 import com.ranji.labourlink.dto.OwnerProfileDto;
 import com.ranji.labourlink.dto.OwnerRequestDto;
 import com.ranji.labourlink.dto.OwnerRequestsResponse;
@@ -24,6 +30,9 @@ public class OwnerService {
 	
 	@Autowired
 	private UserLoginRepo userRepo;
+	
+	@Autowired
+	private WorkerRatingRepo workerRatingRepo;
 	
 	public OwnerRequestsResponse getOwnerRequests(User owner) {
 

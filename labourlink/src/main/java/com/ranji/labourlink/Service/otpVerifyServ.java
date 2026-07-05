@@ -60,21 +60,38 @@ public class otpVerifyServ {
 	    return ResponseEntity.ok("Account Created Successfully");
 	}
 	
-	public ResponseEntity<String> sendOtp(PhoneDto dto) {
-		String s = dto.getPhoneNumber();
-		System.out.println("Phone sent to Twilio: " + dto.getPhoneNumber());
-		User cust = logrep.findByphno(s.substring(s.length()-10));
-		 if (cust != null) {
-		        return ResponseEntity.status(HttpStatus.CONFLICT)
-		                .body("Account with this phone number already exists");
-		    }
-		System.out.println("Verify SID: " + verifySid);
-	    Verification.creator(
-	            verifySid,
-	            dto.getPhoneNumber(),
-	            "sms")
-	            .create();
-	    
-	    return ResponseEntity.ok("OTP Sent Successfully");
+	public ResponseEntity<String> sendRegistrationOtp(PhoneDto dto) {
+
+	    if (logrep.findByPhoneNumber(dto.getPhoneNumber()).isPresent()) {
+
+	        return ResponseEntity.status(HttpStatus.CONFLICT)
+	                .body("Account with this phone number already exists");
+
+	    }
+
+	    return OtpSend(dto);
+
 	}
+	
+	public ResponseEntity<String> OtpSend(PhoneDto dto) {
+
+	    try {
+
+	        Verification.creator(
+	                verifySid,
+	                dto.getPhoneNumber(),
+	                "sms")
+	                .create();
+
+	        return ResponseEntity.ok("OTP Sent Successfully");
+
+	    } catch (Exception e) {
+
+	        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+	                .body("Unable to send OTP");
+	    }
+	}
+	
+	
+	
 }

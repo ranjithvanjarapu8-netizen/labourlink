@@ -101,4 +101,19 @@ public interface WrkRequestRepo extends JpaRepository<WorkRequest,Long>{
 		List<OwnerRequestDto> findOwnerRequests(@Param("ownerId") Long ownerId);
 
 	boolean existsByWorkerAndWorkDateAndStatus(Worker worker, LocalDate workDate, RequestStatusEnum accepted);
+
+	@Query("""
+		    SELECT wr
+		    FROM WorkRequest wr
+		    JOIN FETCH wr.worker w
+		    JOIN FETCH w.user
+		    JOIN FETCH wr.profession
+		    WHERE wr.owner = :owner
+		      AND wr.status = :status
+		    ORDER BY wr.createdAt DESC
+		""")
+		List<WorkRequest> findCompletedRequestsWithWorker(
+		        @Param("owner") User owner,
+		        @Param("status") RequestStatusEnum status
+		);
 }

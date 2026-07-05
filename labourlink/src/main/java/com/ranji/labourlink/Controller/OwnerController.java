@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ranji.labourlink.Model.User;
 import com.ranji.labourlink.Repository.UserLoginRepo;
 import com.ranji.labourlink.Service.OwnerService;
+import com.ranji.labourlink.Service.RequestServ;
+import com.ranji.labourlink.dto.OwnerCompletedRequestDto;
 import com.ranji.labourlink.dto.OwnerProfileDto;
 import com.ranji.labourlink.dto.OwnerRequestsResponse;
 
@@ -29,6 +31,9 @@ public class OwnerController {
 
     @Autowired
     private UserLoginRepo userRepo;
+    
+    @Autowired
+    private RequestServ requestService;
 
     @GetMapping("/requests")
     public ResponseEntity<OwnerRequestsResponse> getOwnerRequests(
@@ -48,6 +53,15 @@ public class OwnerController {
 
         return ResponseEntity.ok(
                 ownerService.getOwnerProfile(authentication.getName()));
+    }
+    
+    @GetMapping("/completed")
+    public ResponseEntity<List<OwnerCompletedRequestDto>> getOwnerCompletedRequests(
+            Authentication authentication) {
+
+        return ResponseEntity.ok(
+                requestService.getOwnerCompletedRequests(authentication.getName())
+        );
     }
 }
 

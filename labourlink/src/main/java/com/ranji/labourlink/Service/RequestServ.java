@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,12 +18,15 @@ import com.ranji.labourlink.Model.RequestStatusEnum;
 import com.ranji.labourlink.Model.User;
 import com.ranji.labourlink.Model.WorkRequest;
 import com.ranji.labourlink.Model.Worker;
+import com.ranji.labourlink.Model.WorkerRating;
 import com.ranji.labourlink.Repository.ProfessionRepo;
 import com.ranji.labourlink.Repository.UserLoginRepo;
+import com.ranji.labourlink.Repository.WorkerRatingRepo;
 import com.ranji.labourlink.Repository.WorkerRepo;
 import com.ranji.labourlink.Repository.WrkRequestRepo;
 import com.ranji.labourlink.dto.AcceptedRequestDto;
 import com.ranji.labourlink.dto.IncomingRequestDto;
+import com.ranji.labourlink.dto.OwnerCompletedRequestDto;
 import com.ranji.labourlink.dto.RequestDetailsDto;
 import com.ranji.labourlink.dto.SendRequestDto;
 
@@ -42,6 +46,9 @@ public class RequestServ {
 	
 	@Autowired
 	private WrkRequestRepo requestRepo;
+	
+	@Autowired
+	private WorkerRatingRepo workerRatingRepo;
 
 	public String sendRequest(String phoneNumber, SendRequestDto dto) {
 
@@ -53,10 +60,6 @@ public class RequestServ {
 
 	    Profession profession = professionRepo.findById(dto.getProfessionId())
 	            .orElseThrow(() -> new RuntimeException("Profession not found"));
-
-	    if (!worker.getAvailable()) {
-	        throw new RuntimeException("Worker is currently unavailable");
-	    }
 
 	    WorkRequest request = new WorkRequest();
 
@@ -95,7 +98,7 @@ public class RequestServ {
 
 	    List<IncomingRequestDto> response = new ArrayList<>();
 
-	    for (WorkRequest request : requests) {
+	    for (WorkRequest request : requests) {	
 
 	        double distance = calculateDistance(
 	                worker.getLatitude(),
@@ -279,8 +282,6 @@ public class RequestServ {
 	
 	    request.setStatus(RequestStatusEnum.ACCEPTED);
 	
-	    worker.setAvailable(false);
-	
 	    requestRepo.save(request);
 	    workerRepo.save(worker);
 	
@@ -364,24 +365,25 @@ public class RequestServ {
 	}
 
 	public List<AcceptedRequestDto> getallcompleted(String phoneNumber) {
-		
-		User user = userRepo.findByPhoneNumber(phoneNumber)
+
+	    User user = userRepo.findByPhoneNumber(phoneNumber)
 	            .orElseThrow(() -> new RuntimeException("User not found"));
 
 	    Worker worker = workerRepo.findByUser(user)
 	            .orElseThrow(() -> new RuntimeException("Worker profile not found"));
+
 	    List<WorkRequest> requests = requestRepo
 	            .findByWorkerAndStatusOrderByCreatedAtDesc(
 	                    worker,
 	                    RequestStatusEnum.COMPLETED);
 
 	    List<AcceptedRequestDto> response = new ArrayList<>();
-	    
+
 	    worker.setTotalJobs(requests.size());
 
 	    for (WorkRequest request : requests) {
 
-	    	double distance = calculateDistance(
+	        double distance = calculateDistance(
 	                worker.getLatitude(),
 	                worker.getLongitude(),
 	                request.getLatitude(),
@@ -409,6 +411,23 @@ public class RequestServ {
 	        dto.setLongitude(request.getLongitude());
 
 	        dto.setStatus(request.getStatus());
+
+	        // ================= Rating =================
+
+	        Optional<WorkerRating> workerRating =
+	                workerRatingRepo.findByRequest(request);
+
+	        if (workerRating.isPresent()) {
+
+	            dto.setRating(workerRating.get().getStars());
+
+	        } else {
+
+	            dto.setRating(null);
+
+	        }
+
+	        // ==========================================
 
 	        response.add(dto);
 	    }
@@ -441,7 +460,6 @@ public class RequestServ {
 	            request.setStatus(RequestStatusEnum.COMPLETED);
 
 	            Worker worker = request.getWorker();
-	            worker.setAvailable(true);
 	        }
 	    }
 
@@ -464,10 +482,67 @@ public class RequestServ {
 	                worker,
 	                RequestStatusEnum.ACCEPTED);
 
-	        worker.setAvailable(!hasActiveJob);
 	    }
 
 	    workerRepo.saveAll(workers);
+	}
+
+	public List<OwnerCompletedRequestDto> getOwnerCompletedRequests(String phoneNumber) {
+
+	    User owner = userRepo.findByPhoneNumber(phoneNumber)
+	            .orElseThrow(() -> new RuntimeException("User not found"));
+
+	    List<WorkRequest> requests =
+	            requestRepo.findCompletedRequestsWithWorker(
+	                    owner,
+	                    RequestStatusEnum.COMPLETED);
+
+	    List<OwnerCompletedRequestDto> response = new ArrayList<>();
+
+	    for (WorkRequest request : requests) {
+
+	        OwnerCompletedRequestDto dto = new OwnerCompletedRequestDto();
+
+	        dto.setRequestId(request.getId());
+	        dto.setTitle(request.getTitle());
+
+	        dto.setWorkerName(
+	                request.getWorker().getUser().getName()
+	        );
+
+	        dto.setProfession(
+	                request.getProfession().getName()
+	        );
+
+	        dto.setDescription(request.getDescription());
+	        dto.setAddress(request.getAddress());
+
+	        dto.setWorkDate(request.getWorkDate());
+	        dto.setStartTime(request.getStartTime());
+	        dto.setEndTime(request.getEndTime());
+
+	        dto.setStatus(request.getStatus().name());
+
+	        Optional<WorkerRating> rating =
+	                workerRatingRepo.findByRequest(request);
+
+	        if (rating.isPresent()) {
+
+	            dto.setRating(
+	                    rating.get().getStars()
+	            );
+
+	        } else {
+
+	            dto.setRating(null);
+
+	        }
+
+	        response.add(dto);
+
+	    }
+
+	    return response;
 	}
 
 }

@@ -32,7 +32,8 @@ public class otpVerfiyContrl {
 	@PostMapping("/send-otp")
 	public ResponseEntity<String> sendOtp(@RequestBody PhoneDto dto){
 
-	    return otpserv.sendOtp(dto);
+	    return otpserv.OtpSend(dto);
 
 	}
+	
 }

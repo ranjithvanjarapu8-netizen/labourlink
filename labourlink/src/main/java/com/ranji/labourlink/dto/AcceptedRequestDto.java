@@ -45,6 +45,8 @@ public class AcceptedRequestDto {
     private LocalTime endTime;
 
     private RequestStatusEnum status;
+    
+    private Integer rating;
     public AcceptedRequestDto() {
     	
     }
@@ -143,6 +145,12 @@ public class AcceptedRequestDto {
 	}
 	public void setStatus(RequestStatusEnum status) {
 		this.status = status;
+	}
+	public Integer getRating() {
+		return rating;
+	}
+	public void setRating(Integer rating) {
+		this.rating = rating;
 	}
     
 

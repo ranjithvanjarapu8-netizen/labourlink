@@ -92,7 +92,7 @@ public class WorkerContrl {
 	@GetMapping("/nearby")
 	public ResponseEntity<List<WorkerCardDto>> getNearbyWorkers(
 	        @RequestParam Double lat,
-	        @RequestParam Double lon,@RequestParam(required = false) String profession,@RequestParam LocalDate date){
+	        @RequestParam Double lon,@RequestParam(required = false) String profession,@RequestParam String date){
 
 	    return ResponseEntity.ok(wrkrserv.getNearbyWorkers(lat, lon,profession,date));
 	}
