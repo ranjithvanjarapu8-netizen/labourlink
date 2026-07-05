@@ -59,31 +59,24 @@ public class WrkWageServ {
 
         return result;
     }
-	public ResponseEntity<?> profwage(String profession) {
+	public ResponseEntity<?> profwage(Long id) {
 
-	    Profession prof = professionRepo.findByProfession(profession);
+	    Profession profession = professionRepo.findById(id)
+	            .orElseThrow(() -> new RuntimeException("Profession not found"));
 
-	    if (prof == null) {
-	        return ResponseEntity.notFound().build();
-	    }
+	    List<WrkWage> works = wageRepo.findByProfession(profession);
 
-	    List<WrkWage> works = wageRepo.findByProfession(prof);
-
-	    List<WorkDto> workDtos = new ArrayList<>();
-
-	    for (WrkWage work : works) {
-
-	        workDtos.add(
-	                new WorkDto(
-	                        work.getId(),
-	                        work.getName(),
-	                        work.getPrice(),
-	                        work.getEstimatedHours(),
-	                        work.getDescription()
-	                )
-	        );
-	    }
+	    List<WorkDto> workDtos = works.stream()
+	            .map(work -> new WorkDto(
+	                    work.getId(),
+	                    work.getName(),
+	                    work.getPrice(),
+	                    work.getEstimatedHours(),
+	                    work.getDescription()
+	            ))
+	            .toList();
 
 	    return ResponseEntity.ok(workDtos);
 	}
+
 }
