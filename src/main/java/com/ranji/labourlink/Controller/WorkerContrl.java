@@ -25,6 +25,7 @@ import com.ranji.labourlink.Repository.UserLoginRepo;
 import com.ranji.labourlink.Repository.WorkerRepo;
 import com.ranji.labourlink.Service.WorkerServ;
 import com.ranji.labourlink.dto.OwnrWrkrProfileDto;
+import com.ranji.labourlink.dto.UserInfoDto;
 import com.ranji.labourlink.dto.WorkerCardDto;
 import com.ranji.labourlink.dto.WorkerRegisterDto;
 import com.ranji.labourlink.dto.WrkrProfileDto;
@@ -100,5 +101,19 @@ public class WorkerContrl {
 	public ResponseEntity<OwnrWrkrProfileDto> getIdWrkr(@PathVariable Long id){
 		return wrkrserv.getIdWrkr(id);
 	}
-	
+	@GetMapping("/userinfo")
+	public ResponseEntity<UserInfoDto> getUserInfo(Authentication authentication) {
+
+	    String phone = authentication.getName();
+
+	    User user = userrep.findByPhoneNumber(phone)
+	            .orElseThrow(() -> new RuntimeException("User not found"));
+
+	    UserInfoDto dto = new UserInfoDto();
+
+	    dto.setName(user.getName());
+	    dto.setPhoneNumber(user.getPhoneNumber());
+
+	    return ResponseEntity.ok(dto);
+	}
 }
