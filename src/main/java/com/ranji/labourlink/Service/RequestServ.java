@@ -434,7 +434,8 @@ public class RequestServ {
 
 	    return response;
 	}
-	//@Scheduled(initialDelay = 180000, fixedRate = 60000)
+	
+	@Scheduled(initialDelay = 180000, fixedRate = 60000)
 	@Transactional
 	public void updateRequestStatuses() {
 
