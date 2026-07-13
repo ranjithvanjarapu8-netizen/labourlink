@@ -1,5 +1,7 @@
 package com.ranji.labourlink.Service;
-
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
+import java.util.Map;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -50,6 +52,11 @@ public class WorkerServ {
 	@Autowired
 	private WorkerProfessionRepo workerProfessionRepo;
 	
+	private final Cloudinary cloudinary;
+	public WorkerServ(Cloudinary cloudinary) {
+	    this.cloudinary = cloudinary;
+	}
+	
 	public boolean hasWorkerProfile(User user) {
 	    return wrkrrep.existsByUser(user);
 	}
@@ -70,25 +77,21 @@ public class WorkerServ {
 	        return "Only image files are allowed.";
 	    }
 
-	    String uploadDir = "uploads/workers/";
-
-	    String fileName =
-	            System.currentTimeMillis() + "_" + photo.getOriginalFilename();
-
-	    Path path = Paths.get(uploadDir);
-
-	    if (!Files.exists(path)) {
-	        try {
-	            Files.createDirectories(path);
-	        } catch (IOException e) {
-	            throw new RuntimeException("Unable to save profile photo.", e);
-	        }
-	    }
+	    String imageUrl;
 
 	    try {
-	        photo.transferTo(path.resolve(fileName));
-	    } catch (IOException | IllegalStateException e) {
-	        throw new RuntimeException("Unable to save profile photo.", e);
+
+	        Map uploadResult = cloudinary.uploader().upload(
+	                photo.getBytes(),
+	                ObjectUtils.emptyMap()
+	        );
+
+	        imageUrl = uploadResult.get("secure_url").toString();
+
+	    } catch (IOException e) {
+
+	        throw new RuntimeException("Unable to upload profile photo.", e);
+
 	    }
 
 	    Worker worker = new Worker();
@@ -108,7 +111,7 @@ public class WorkerServ {
 	    worker.setDescription(dto.getDescription());
 
 	    worker.setAvailable(true);
-	    worker.setProfilePhoto(fileName);
+	    worker.setProfilePhoto(imageUrl);
 
 	    // Save worker first
 	    worker = wrkrrep.save(worker);

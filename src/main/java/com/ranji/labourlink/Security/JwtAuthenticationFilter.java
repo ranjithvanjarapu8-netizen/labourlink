@@ -32,6 +32,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     FilterChain filterChain)
             throws ServletException, IOException {
 
+        String path = request.getServletPath();
+
+        // Skip JWT validation for public endpoints
+        if (path.startsWith("/api/auth")
+                || path.startsWith("/otp")
+                || path.startsWith("/forgot-password")
+                || path.startsWith("/api/profession")
+                || path.startsWith("/api/wages")
+                || path.startsWith("/uploads")) {
+
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         String authHeader = request.getHeader("Authorization");
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
@@ -39,33 +53,37 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        String token = authHeader.substring(7);
+        try {
 
-        String phoneNumber = jwtUtil.getPhoneNumber(token);
+            String token = authHeader.substring(7);
 
-        if (phoneNumber != null &&
-                SecurityContextHolder.getContext().getAuthentication() == null) {
+            String phoneNumber = JwtUtil.getPhoneNumber(token);
 
-            UserDetails userDetails =
-                    userDetailsService.loadUserByUsername(phoneNumber);
+            if (phoneNumber != null &&
+                    SecurityContextHolder.getContext().getAuthentication() == null) {
 
-            if (jwtUtil.isTokenValid(token)) {
+                UserDetails userDetails =
+                        userDetailsService.loadUserByUsername(phoneNumber);
 
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(
-                                userDetails,
-                                null,
-                                userDetails.getAuthorities()
-                        );
+                if (jwtUtil.isTokenValid(token)) {
 
-                authentication.setDetails(
-                        new WebAuthenticationDetailsSource()
-                                .buildDetails(request)
-                );
+                    UsernamePasswordAuthenticationToken authentication =
+                            new UsernamePasswordAuthenticationToken(
+                                    userDetails,
+                                    null,
+                                    userDetails.getAuthorities());
 
-                SecurityContextHolder.getContext()
-                        .setAuthentication(authentication);
+                    authentication.setDetails(
+                            new WebAuthenticationDetailsSource()
+                                    .buildDetails(request));
+
+                    SecurityContextHolder.getContext()
+                            .setAuthentication(authentication);
+                }
             }
+
+        } catch (Exception e) {
+            // Ignore invalid/expired token
         }
 
         filterChain.doFilter(request, response);
