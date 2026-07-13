@@ -18,9 +18,11 @@ import com.ranji.labourlink.Model.RequestStatusEnum;
 import com.ranji.labourlink.Model.User;
 import com.ranji.labourlink.Model.WorkRequest;
 import com.ranji.labourlink.Model.Worker;
+import com.ranji.labourlink.Model.WorkerLocation;
 import com.ranji.labourlink.Model.WorkerRating;
 import com.ranji.labourlink.Repository.ProfessionRepo;
 import com.ranji.labourlink.Repository.UserLoginRepo;
+import com.ranji.labourlink.Repository.WorkerLocationRepo;
 import com.ranji.labourlink.Repository.WorkerRatingRepo;
 import com.ranji.labourlink.Repository.WorkerRepo;
 import com.ranji.labourlink.Repository.WrkRequestRepo;
@@ -50,6 +52,9 @@ public class RequestServ {
 	@Autowired
 	private WorkerRatingRepo workerRatingRepo;
 
+	@Autowired
+	private WorkerLocationRepo workerLocationRepo;
+	
 	public String sendRequest(String phoneNumber, SendRequestDto dto) {
 
 	    User owner = userRepo.findByPhoneNumber(phoneNumber)
@@ -445,29 +450,67 @@ public class RequestServ {
 
 	    for (WorkRequest request : requests) {
 
+	        LocalDateTime workStarts = LocalDateTime.of(
+	                request.getWorkDate(),
+	                request.getStartTime());
+
 	        LocalDateTime workEnds = LocalDateTime.of(
 	                request.getWorkDate(),
 	                request.getEndTime());
 
+	        // Reject pending requests after work end time
 	        if (request.getStatus() == RequestStatusEnum.PENDING
 	                && now.isAfter(workEnds)) {
 
 	            request.setStatus(RequestStatusEnum.REJECTED);
 	        }
 
-	        else if (request.getStatus() == RequestStatusEnum.ACCEPTED
-	                && now.isAfter(workEnds)) {
-
-	            request.setStatus(RequestStatusEnum.COMPLETED);
+	        // Handle accepted requests
+	        else if (request.getStatus() == RequestStatusEnum.ACCEPTED) {
 
 	            Worker worker = request.getWorker();
+
+	            WorkerLocation location = workerLocationRepo
+	                    .findByWorker(worker)
+	                    .orElseGet(() -> {
+
+	                        WorkerLocation wl = new WorkerLocation();
+
+	                        wl.setWorker(worker);
+	                        wl.setLatitude(worker.getLatitude());
+	                        wl.setLongitude(worker.getLongitude());
+	                        wl.setLastUpdated(LocalDateTime.now());
+	                        wl.setTrackingEnabled(false);
+
+	                        return workerLocationRepo.save(wl);
+	                    });
+
+	            LocalDateTime trackingStarts = workStarts.minusHours(1);
+
+	            // Enable tracking 1 hour before work starts
+	            if (now.isAfter(trackingStarts)
+	                    && now.isBefore(workEnds)
+	                    && !location.getTrackingEnabled()) {
+
+	                location.setTrackingEnabled(true);
+	                workerLocationRepo.save(location);
+	            }
+
+	            // Work completed
+	            if (now.isAfter(workEnds)) {
+
+	                request.setStatus(RequestStatusEnum.COMPLETED);
+
+	                location.setTrackingEnabled(false);
+	                workerLocationRepo.save(location);
+	            }
 	        }
 	    }
 
-	    // Save all request status changes first
+	    // Save all request status changes
 	    requestRepo.saveAll(requests);
 
-	    // Now update every worker's completed job count
+	    // Update worker completed job count
 	    List<Worker> workers = workerRepo.findAll();
 
 	    for (Worker worker : workers) {
@@ -478,11 +521,12 @@ public class RequestServ {
 
 	        worker.setTotalJobs((int) completedJobs);
 
-	        // Optional: if you still use a single availability flag
 	        boolean hasActiveJob = requestRepo.existsByWorkerAndStatus(
 	                worker,
 	                RequestStatusEnum.ACCEPTED);
 
+	        // Optional:
+	        // worker.setAvailable(!hasActiveJob);
 	    }
 
 	    workerRepo.saveAll(workers);

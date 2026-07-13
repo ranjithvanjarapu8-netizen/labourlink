@@ -59,4 +59,5 @@ public class WorkerLocationController {
                 workerLocationService.getTrackingStatus(phoneNumber)
         );
     }
+    
 }
