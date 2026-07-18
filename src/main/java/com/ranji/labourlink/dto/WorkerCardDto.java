@@ -20,22 +20,31 @@ public class WorkerCardDto {
 
     private Double distance;
     
+    private Integer dailyWage;
     public WorkerCardDto() {
     	
     }
 
 
-	public WorkerCardDto(Long workerId, String name, List<String> profession, Integer experience, Double rating,
-			Integer totalJobs, String profilePhoto, Double distance) {
-		super();
-		this.workerId = workerId;
-		this.name = name;
-		this.profession = profession;
-		this.experience = experience;
-		this.rating = rating;
-		this.totalJobs = totalJobs;
-		this.profilePhoto = profilePhoto;
-		this.distance = distance;
+    public WorkerCardDto(Long workerId,
+	            String name,
+	            List<String> profession,
+	            Integer experience,
+	            Double rating,
+	            Integer totalJobs,
+	            String profilePhoto,
+	            Double distance,
+	            Integer dailyWage) {
+	
+	this.workerId = workerId;
+	this.name = name;
+	this.profession = profession;
+	this.experience = experience;
+	this.rating = rating;
+	this.totalJobs = totalJobs;
+	this.profilePhoto = profilePhoto;
+	this.distance = distance;
+	this.dailyWage = dailyWage;
 	}
 
 	public Long getWorkerId() {
@@ -104,7 +113,11 @@ public class WorkerCardDto {
 	public void setDistance(Double distance) {
 		this.distance = distance;
 	}
-    
-    
+	public Integer getDailyWage() {
+	    return dailyWage;
+	}
 
+	public void setDailyWage(Integer dailyWage) {
+	    this.dailyWage = dailyWage;
+	}
 }

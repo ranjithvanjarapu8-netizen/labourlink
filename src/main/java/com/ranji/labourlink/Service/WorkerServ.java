@@ -275,6 +275,14 @@ public class WorkerServ {
 	                    .toList();
 
 	            dto.setProfession(professionNames);
+	            Integer dailyWage = worker.getWorkerProfessions()
+	                    .stream()
+	                    .filter(wp -> wp.getProfession().getName().equalsIgnoreCase(profession))
+	                    .map(wp -> wp.getProfession().getDailyWage())
+	                    .findFirst()
+	                    .orElse(0);
+
+	            dto.setDailyWage(dailyWage);
 
 	            // Highest experience among all professions
 	            Integer experience = worker.getWorkerProfessions()

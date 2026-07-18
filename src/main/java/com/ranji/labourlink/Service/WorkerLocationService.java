@@ -102,7 +102,8 @@ public class WorkerLocationService {
                 .orElseThrow(() -> new RuntimeException("Worker location not found"));
 
         LiveLocationDto dto = new LiveLocationDto();
-
+        System.out.println("Request ID: " + requestId);
+    	System.out.println("Worker ID: " + request.getWorker().getId());
         dto.setRequestId(request.getId());
         dto.setWorkerId(request.getWorker().getId());
 

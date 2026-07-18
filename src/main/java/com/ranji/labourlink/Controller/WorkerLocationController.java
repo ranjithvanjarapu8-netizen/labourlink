@@ -20,10 +20,14 @@ public class WorkerLocationController {
 
     @Autowired
     private WorkerLocationService workerLocationService;
+    
     @PostMapping("/location")
     public ResponseEntity<String> updateLocation(
             Authentication authentication,
             @RequestBody LocationDto dto) {
+
+        System.out.println("Location API called");
+        System.out.println(dto.getLatitude() + "," + dto.getLongitude());
 
         String phoneNumber = authentication.getName();
 
@@ -36,6 +40,8 @@ public class WorkerLocationController {
     public ResponseEntity<WorkerLocationResponseDto> getWorkerLocation(
             @PathVariable Long workerId) {
 
+        System.out.println("Employer requested workerId = " + workerId);
+
         return ResponseEntity.ok(
                 workerLocationService.getWorkerLocation(workerId)
         );
@@ -44,7 +50,7 @@ public class WorkerLocationController {
     @GetMapping("/{requestId}/live-location")
     public ResponseEntity<LiveLocationDto> getLiveLocation(
             @PathVariable Long requestId) {
-
+    	
         return ResponseEntity.ok(
                 workerLocationService.getLiveLocation(requestId)
         );
