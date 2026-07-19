@@ -82,7 +82,11 @@ public class WorkerLocationService {
 
         dto.setLatitude(location.getLatitude());
         dto.setLongitude(location.getLongitude());
-        dto.setLastUpdated(location.getLastUpdated());
+        dto.setLastUpdated(
+        	    location.getLastUpdated()
+        	            .plusHours(5)
+        	            .plusMinutes(30)
+        	);
 
         return dto;
     }
@@ -115,7 +119,11 @@ public class WorkerLocationService {
 
         dto.setStatus(request.getStatus().name());
 
-        dto.setLastUpdated(location.getLastUpdated());
+        dto.setLastUpdated(
+        	    location.getLastUpdated()
+        	            .plusHours(5)
+        	            .plusMinutes(30)
+        	);
 
         return dto;
     }
