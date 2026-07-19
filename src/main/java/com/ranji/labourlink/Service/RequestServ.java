@@ -2,6 +2,7 @@ package com.ranji.labourlink.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -447,7 +448,8 @@ public class RequestServ {
 	    List<WorkRequest> requests = requestRepo.findAll();
 
 	    LocalDateTime now = LocalDateTime.now();
-
+	    System.out.println("LocalDateTime.now(): " + LocalDateTime.now());
+	    System.out.println("ZoneId: " + ZoneId.systemDefault());
 	    for (WorkRequest request : requests) {
 
 	        LocalDateTime workStarts = LocalDateTime.of(
